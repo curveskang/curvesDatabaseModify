@@ -1,11 +1,11 @@
-﻿
-//mappingTable_keys=Object.keys(mappingTable)
+﻿// From
+//nameMappingTable_keys=Object.keys(nameMappingTable)
 //var bbb=[];
-//for (var i=0; i< mappingTable_keys.length; i++) {
-//    bbb.push(mappingTable[mappingTable_keys[i]])
+//for (var i=0; i< nameMappingTable_keys.length; i++) {
+//    bbb.push(nameMappingTable[nameMappingTable_keys[i]])
 //}
 
-var mappingTable = {
+var nameMappingTable = {
   "order_No":"訂單編號",
   "previous_Order_No":"前筆訂單編號",
   "sold_Franchise_Code":"販售店鋪代號",
@@ -137,6 +137,140 @@ var mappingTable = {
   "probiotics_Sold_Count":"現場已販售(益菌)",
   "serverUpdateTime":"總部更新時間點(同步用)"
 }
+
+var typeMappingTable = {
+  "order_No":"string",
+  "previous_Order_No":"string",
+  "sold_Franchise_Code":"string",
+  "sold_Franchise_Name":"string",
+  "belonging_Franchise_Code":"string",
+  "belonging_Franchise_Name":"string",  
+  "member_No":"string",
+  "member_Name":"string",
+  "mobile_No":"string",
+  "monthly_Shipment_Date":"int",
+  "order_Date":"dateTime",
+  "firstShippingMonth":"dateTime",
+  "coach_Name":"string",
+  "birthday":"dateTime",
+  "email_Address":"string",
+  "receiver_Name":"string",
+  "receiver_TEL":"string",
+  "receiver_Zip_Code":"string",
+  "receiver_City":"string",
+  "receiver_Town":"string",
+  "receiver_Address":"string",
+  "member_Type":"string",
+  "fourIn1_Number":"int",
+  "lemon_Number":"int",
+  "matcha_Number":"int",
+  "sesame_Number":"int",
+  "pumpkinPeanut_Number":"int",
+  "tieguanyin_Number":"int",
+  "protein_Recurring_Number":"int",
+  "protein_Monthly_Charge":"double",
+  "probiotics_Recurring_Number":"int",
+  "probiotics_Monthly_Charge":"double",
+  "credit_Card":"bool",
+  "bank_Transfer":"bool",
+  "credit_Card_No":"string",
+  "credit_Card_Period":"dateTime",
+  "as_Member_Data":"bool",
+  "credit_Card_Relation":"string",
+  "credit_Card_Sign":"byte[]",
+  "protein_Bank_Transfer_People":"int",
+  "protein_Bank_Transfer_Charge":"double",
+  "probiotics_Bank_Transfer_People":"int",
+  "probiotics_Bank_Transfer_Charge":"double",
+  "bank_Transfer_Date":"dateTime",
+  "bank_Transfer_No":"string",
+  "depositor_Without_Bankbook_Name":"string",
+  "confirm_Terms":"bool",
+  "two_Copies_Invoice":"bool",
+  "e_Invoice_Vehicle_No":"string",
+  "e_Invoice_Vehicle_Type":"string",
+  "three_Copies_Invoice":"bool",
+  "tax_ID_Number":"string",
+  "invoice_Title":"string",
+  "notice_1":"bool",
+  "notice_2":"bool",
+  "notice_3":"bool",
+  "notice_4":"bool",
+  "notice_5":"bool",
+  "notice_6":"bool",
+    
+  "time_FA":"bool",
+  "time_FWO":"bool",
+  "time_2W":"bool",
+  "time_1WM":"bool",
+  "time_2_3WM":"bool",
+  "time_Over_3WM":"bool",
+
+  "tools_BK":"bool",
+  "tools_OpenL":"bool",
+  "tools_ReservedL":"bool",
+
+  "tools_PT":"bool",
+  "tools_DM":"bool",
+  "tools_None":"bool",
+ 
+  "order_Sign":"byte[]",
+  "order_Remark":"string",
+  
+  /// 訂單狀態, 「P」暫停，「X」退訂，「E」有效訂購單，「R」送審中，「Z」無效，「空白」未定狀態
+  "order_Status": "string",
+  "submission_Date":"dateTime",
+  "approved_Date":"dateTime",
+  "approved":"bool",
+  "funtion_Code":"string",
+  "created_Date":"dateTime",
+  "creator_ID":"string",
+  "creator_Name":"string",
+  
+  /// 20181206 記錄由 HC05 Grid 增加的出貨時間
+ 
+  "出貨時間歷史記錄":"array",
+
+  //    #region 暫停專區
+  "suspend_Protein":"bool",
+  "suspend_Probiotics":"bool",
+  "suspend_Reason":"string",
+  "suspend_Start_Month":"dateTime",
+  "suspend_End_Month":"dateTime",
+  "suspend_Confirm_Terms":"bool",
+  "recovery_Shipment_Month":"dateTime",
+  "recovery_Shipment_Day":"dateTime",
+  
+  //#endregion 暫停專區
+
+  //#region 退訂專區
+  "cancel_Reason_Protein":"string",
+  "cancel_Confirm_Terms_Protein":"bool",
+  "last_Shipment_Date_Protein":"dateTime",
+  "cancel_Reason_Probiotics":"string",
+  "cancel_Confirm_Terms_Probiotics":"bool",
+  "last_Shipment_Date_Probiotics":"dateTime",
+  //#endregion
+
+  /// 190904 新增最後刷卡時間，由 SKBRProcess API 進行更新
+ 
+  "最後刷卡時間":"dateTime",
+  
+  /// 191007 單盒配送箱(數量)，可由 HC01/HC05 更新
+  "single_Delivery_Box":"int",
+
+  //#region 訂單匯入專區
+  "import_Order_No":"string",
+  "import_Time":"dateTime",
+  "is_Import":"bool",
+  "import_Ship_History":"array",
+  //#endregion
+
+  "protein_Sold_Count":"int",
+  "probiotics_Sold_Count":"int",
+  "serverUpdateTime":"dateTime"
+}
+
 
 //  
 //#if DevpServer || DEBUG

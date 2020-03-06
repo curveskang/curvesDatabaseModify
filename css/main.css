@@ -130,19 +130,20 @@ h2 {
 .couponInputDetail{
   height: 20px;
   width: 200px;
-  font-size: 16px;
+  font-size: 14px;
   margin: 5px;
   font-family:'Noto Sans TC';
 }
 
 .couponLabelDetail {
   font-weight: bold;
-  height: 20px;
+  height: 16px;
   display: inline-block;
-  width: 280px; padding-top: 5px;  
+  width: 200px; padding-top: 5px;  
   margin-left: 20px;
   font-size: 16px;
   font-family:'Noto Sans TC';
+  text-align: right;
 }
 
 #couponNumber {
