@@ -1,0 +1,138 @@
+0: "id"
+1: "tableType"
+
+
+
+
+
+
+2: "order_No"
+3: "previous_Order_No"
+4: "sold_Franchise_Code"
+5: "sold_Franchise_Name"
+6: "belonging_Franchise_Code"
+7: "belonging_Franchise_Name"
+8: "member_No"
+9: "member_Name"
+10: "mobile_No"
+11: "monthly_Shipment_Date"
+12: "order_Date"
+13: "firstShippingMonth"
+14: "coach_Name"
+15: "birthday"
+16: "email_Address"
+17: "receiver_Name"
+18: "receiver_TEL"
+19: "receiver_Zip_Code"
+20: "receiver_City"
+21: "receiver_Town"
+22: "receiver_Address"
+23: "member_Type"
+24: "fourIn1_Number"
+25: "lemon_Number"
+26: "matcha_Number"
+27: "sesame_Number"
+28: "pumpkinPeanut_Number"
+29: "tieguanyin_Number"
+30: "protein_Recurring_Number"
+31: "protein_Monthly_Charge"
+32: "probiotics_Recurring_Number"
+33: "probiotics_Monthly_Charge"
+34: "credit_Card"
+35: "bank_Transfer"
+36: "credit_Card_No"
+37: "credit_Card_Period"
+38: "as_Member_Data"
+39: "credit_Card_Relation"
+40: "credit_Card_Sign"
+41: "protein_Bank_Transfer_People"
+42: "protein_Bank_Transfer_Charge"
+43: "probiotics_Bank_Transfer_People"
+44: "probiotics_Bank_Transfer_Charge"
+45: "bank_Transfer_Date"
+46: "bank_Transfer_No"
+47: "depositor_Without_Bankbook_Name"
+48: "confirm_Terms"
+49: "two_Copies_Invoice"
+50: "e_Invoice_Vehicle_No"
+51: "e_Invoice_Vehicle_Type"
+52: "three_Copies_Invoice"
+53: "tax_ID_Number"
+54: "invoice_Title"
+55: "notice_1"
+56: "notice_2"
+57: "notice_3"
+58: "notice_4"
+59: "notice_5"
+60: "notice_6"
+
+61: "time_FA"
+62: "time_FWO"
+63: "time_2W"
+64: "time_1WM"
+65: "time_2_3WM"
+66: "time_Over_3WM"
+
+67: "tools_BK"
+68: "tools_OpenL"
+69: "tools_ReservedL"
+
+70: "tools_PT"
+71: "tools_DM"
+72: "tools_None"
+
+73: "order_Sign"
+74: "order_Remark"
+
+
+75: "order_Status"
+76: "submission_Date"
+77: "approved_Date"
+78: "approved"
+79: "funtion_Code"
+80: "created_Date"
+81: "creator_ID"
+82: "creator_Name"
+
+
+
+83: "出貨時間歷史記錄"
+
+
+84: "suspend_Protein"
+85: "suspend_Probiotics"
+86: "suspend_Reason"
+87: "suspend_Start_Month"
+88: "suspend_End_Month"
+89: "suspend_Confirm_Terms"
+90: "recovery_Shipment_Month"
+91: "recovery_Shipment_Day"
+
+
+
+
+92: "cancel_Reason_Protein"
+93: "cancel_Confirm_Terms_Protein"
+94: "last_Shipment_Date_Protein"
+95: "cancel_Reason_Probiotics"
+96: "cancel_Confirm_Terms_Probiotics"
+97: "last_Shipment_Date_Probiotics"
+
+
+
+
+98: "最後刷卡時間"
+
+
+99: "single_Delivery_Box"
+
+
+100: "import_Order_No"
+101: "import_Time"
+102: "is_Import"
+103: "import_Ship_History"
+
+
+104: "protein_Sold_Count"
+105: "probiotics_Sold_Count"
+106: "serverUpdateTime"
