@@ -21,6 +21,9 @@
   <script src="js/loading.js"></script>
   <script src="js/diff.js"></script>  
   <script src="HC_Order_Main_Model.js"></script>  
+  <script>
+      logoutByReload=true; // set to true for security
+  </script>  
 </head>
 
 <body>
@@ -34,6 +37,8 @@
       <input id="password" class="couponInput" style="width: 440px" type="password" placeholder="請輸入密碼"><br>
 
       <button class="btn-blue" onclick="signIn()" style="margin-left: 350px"><i class="fa fa-sign-in"></i>&nbsp 登入</button>
+      
+      <p style="font-family:'Noto Sans TC'; background-color: red;color: white;font-size: 18px">注意: 因為登入後，可以直接修改資料庫，請將帳密妥善保管及提供給必要的人</p>
     </div>
   </div>
   
@@ -42,8 +47,8 @@
     <span class="couponLabel">訂單號碼</span><input class="couponInput" id="order_No" value="A161000436">
     
     <button class="btn-blue" onclick="downloadOrder()" style="float:none"><i class="fa fa-download"></i>&nbsp 下載訂單</button>
-    <button class="btn-red" onclick="signout()" style="float:none"><i class="fa fa-upload"></i>&nbsp 修改上傳</button>
-    <button class="btn-red" onclick="signout()" style="float:none;background-color: teal"><i class="fa fa-history"></i>&nbsp 修改歷程</button>        
+    <button class="btn-red" onclick="uploadModifiedOrder()" style="float:none"><i class="fa fa-upload"></i>&nbsp 上傳修改訂單</button>
+    <button class="btn-red" onclick="下載訂單修改歷程()" style="float:none;background-color: teal"><i class="fa fa-history"></i>&nbsp 下載修改歷程</button>        
     <button class="btn-red" onclick="signout()" style="float:none;background-color: darkslategray"><i class="fa fa-sign-out"></i>&nbsp 登出</button> 
        
     <hr> 
@@ -79,19 +84,22 @@
       measurementId: "G-LZ3DN86LX1"
     };
     // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
     
+    firebase.initializeApp(firebaseConfig);
     var database = firebase.database();
 
     var authUser;
     var isLogin = false;
+    var MKKK;
+    var UNKKK;
     
-    firebase.auth().signOut();
-    
-    //$("#headerDiv").hide();
+    if (logoutByReload) {
+      firebase.auth().signOut();
+      $("#headerDiv").hide();
+    }
     
     firebase.auth().onAuthStateChanged(function(user) {
-      console.log(user);
+      //console.log(user);
       authUser = user;
 
       if (user == null) {
@@ -100,9 +108,10 @@
         isLogin = false;
       } else {
         // login
-        console.log(user.email);
+        //console.log(user.email);
         isLogin = true;
-        console.log("Login-in");
+        
+        //console.log("Login-in");
         $.loading.end();
         $("#loginDiv").hide();
         $("#headerDiv").show();
@@ -116,6 +125,7 @@
         $("#emailAddress").val("");
         $("#emailAddress").attr("placeholder", "Email Address Error, try again!");
         $("#emailAddress").css("background-color", "yellow");
+        $("#password").val("");
       } else {
         $.loading.start("登入中");
         firebase.auth().signInWithEmailAndPassword($("#emailAddress").val(), $("#password").val()).catch(function(error) {
@@ -125,6 +135,7 @@
           alert("Login Error! Try again!")
           $.loading.end();
         });
+        $("#password").val("");
       }
     }
 
@@ -145,36 +156,35 @@
       $("#emailAddress").val("");
       $("#password").val("");
       $("#loginDiv").show();
-      $("#headerDiv").hide();      
+      $("#headerDiv").hide();    
+      
+      setTimeout(location.reload(), 1000);
     }
     
     function downloadOrder() {
-//      if (authUser == null) {
-//        isLogin = false;
-//        alert("請先登入");
-//        $("#loginDiv").show();        
-//        $("#headerDiv").hide(); 
-//        return 1;
-//      }
+      if (authUser == null) {
+        isLogin = false;
+        alert("請先登入");
+        $("#loginDiv").show();        
+        $("#headerDiv").hide(); 
+        return 1;
+      }
       
       console.log("downloadOrder");
       var request = new XMLHttpRequest();
       
-//      request.open('GET', 'https://cvoscloud.azurewebsites.net/api/HC_Order_Main?OrderNo=A161000436&Code=debug123&VM=false', false);  
-
       var orderNO = $("#order_No").val();
-      var paramToSend = 'https://curves-database-api.herokuapp.com/?API=01&Order_NO='+orderNO;
-      console.log(paramToSend);
+      var paramToSend = 'https://curves-database-api.herokuapp.com/?API=01&Order_NO='+orderNO+"&Access="+authUser.uid;
+      //var paramToSend = 'http://localhost:5000/?API=01&Order_NO='+orderNO+"&Access="+authUser.uid;
+      //console.log(paramToSend);
       
       $.loading.start("讀取訂單");      
-//      request.open('GET', 'https://curves-database-api.herokuapp.com/?API=01&Order_NO=A161000032', true);
       request.open('GET', paramToSend, true);
       request.send();
       
-
       request.onload = function(e) {
-        if (request.status === 200) {          
-          //console.log(request.responseText);  
+        //console.log(request.responseText, (request.responseText!="Error: No access"));         
+        if ((request.status == 200) && (request.responseText!="Error: No access")) {
           resultObj = JSON.parse(request.responseText);
           orderDetailObj = JSON.parse(resultObj);
           console.log("訂單讀取完成");
@@ -222,28 +232,68 @@
       $("#orderDetailDiv").append("<div id='orderDetail'></div>");
       
       for (var i=0; i< chineseKeyLength; i++) {
+        // 準備第一欄資料
         var itemValue1 = orderDetailObj.obj[englishKeys[i]]; 
+        // Mask
+        if (englishKeys[i]=="credit_Card_No") {
+          UNKKK = orderDetailObj.obj[englishKeys[i]];
+          if (UNKKK.length == 16) {
+            MKKK = "XXXXXXXXXXXX"+UNKKK.substring(12,16);
+            itemValue1 = MKKK;         
+          } else {
+            alert("信用卡號非 16 位");
+          }         
+        }
+        
         var elementStr1 = "<span class='couponLabelDetail'>"+chineseKeys[i]+"</span>"
                          +"<input class='couponInputDetail' value='"+itemValue1+"' "
                          +"id='"+englishKeys[i]+"'>";
         $("#orderDetail").append(elementStr1);      
         
-        if ((i+1) < chineseKeyLength) {       
-          var itemValue2 = orderDetailObj.obj[englishKeys[i+1]];  
+        // 準備第二欄資料
+        if ((i+1) < chineseKeyLength) {               
+          var itemValue2 = orderDetailObj.obj[englishKeys[i+1]]; 
+          // Mask
+          if (englishKeys[i+1]=="credit_Card_No") {
+            UNKKK = orderDetailObj.obj[englishKeys[i+1]];
+            if (UNKKK.length == 16) {
+              MKKK = "XXXXXXXXXXXX"+UNKKK.substring(12,16);
+              itemValue2 = MKKK;
+              console.log(itemValue1);            
+            } else {
+              alert("信用卡號非 16 位");
+            }         
+          }          
           var elementStr2 = "<span class='couponLabelDetail'>"+chineseKeys[i+1]+"</span>"
                            +"<input class='couponInputDetail' value='"+itemValue2+"' "
-                           +"id='"+englishKeys[i+1]+"'>";           
+                           +"id='"+englishKeys[i+1]+"'><br>";           
           $("#orderDetail").append(elementStr2); 
 
           i++;
         }
       };
       
-      $("#orderDetail").append('<hr><button class="btn-blue" onclick="downloadOrder()" style="float:none;margin-left:380px"><i class="fa fa-download"></i>&nbsp 下載資料</button><button class="btn-red" onclick="signout()" style="float:none"><i class="fa fa-upload"></i>&nbsp 修改上傳</button><button class="btn-red" onclick="signout()" style="float:none;background-color: teal"><i class="fa fa-history"></i>&nbsp 修改歷程</button><button class="btn-red" onclick="signout()" style="float:none;background-color: darkslategray"><i class="fa fa-sign-out"></i>&nbsp 登出</button>');
+      $("#orderDetail").append('<hr><button class="btn-blue" onclick="downloadOrder()" style="float:none;margin-left:380px"><i class="fa fa-download"></i>&nbsp 下載資料</button><button class="btn-red" onclick="uploadModifiedOrder()" style="float:none"><i class="fa fa-upload"></i>&nbsp 上傳修改訂單</button><button class="btn-red" onclick="下載訂單修改歷程()" style="float:none;background-color: teal"><i class="fa fa-history"></i>&nbsp 下載修改歷程</button><button class="btn-red" onclick="signout()" style="float:none;background-color: darkslategray"><i class="fa fa-sign-out"></i>&nbsp 登出</button>');
     }
 
+    function uploadModifiedOrder() {
+      console.log("uploadModifiedOrder");
+      
+      var modifiedOrder = combineOrderDetail();
+      var orderDiff = diff(orgOrder, modifiedOrder);
+      
+      if (jQuery.isEmptyObject(orderDiff)) {
+        alert("訂單沒有修改，不上傳");
+      } else {
+        // TODO: 上傳 modifiedOrder 到 Curves database by API
+        
+        // 上傳 修改歷程 到 Firebase
+        upload修改歷程(modifiedOrder.order_No, orderDiff);        
+      }
+    }
+    
     function combineOrderDetail() {
-      orderModified={};
+      var orderModified={};
       
       orderModified["id"]=orgOrder["id"];
       orderModified["tableType"]=orgOrder["tableType"];      
@@ -264,14 +314,90 @@
           case 'array':   項目資料 = orgOrder[englishKeys[i]]; break;            
           default: console.log("error type", typeMappingTable[englishKeys[i]]);
         }
+        
+        // UnMask
+        if (englishKeys[i]=="credit_Card_No") {
+          if (項目資料==MKKK) 項目資料=UNKKK;         
+        }
+        
         orderModified[englishKeys[i]]=項目資料;
       };
-           
+      
+      return orderModified;           
     }
     
+    function upload修改歷程(order_No, orderDiff){
+      console.log("upload修改歷程");
+      //console.log(order_No, orderDiff);
+
+      // use dateTime as the tag
+      var nowTime = new Date();
+      var dateISOString = nowTime.toISOString();
+      dateISOString = dateISOString.substr(0,19)+"Z";
+      
+      database.ref('Curves/訂單修改歷程/'+dateISOString+"/"+order_No).set({
+        修改前訂單: JSON.stringify(orgOrder),
+        訂單修改差異: JSON.stringify(orderDiff),
+        訂單修改者: authUser.email,        
+      }, function(error){
+        if (error) {
+          console.log(error);
+          return 0;
+        }
+        alert("修改訂單上傳完成")  
+        console.log('Write to database successful');
+      });       
+    }
+    
+    function 下載訂單修改歷程() {
+      
+      // check firebase auth
+//      if (authUser == null) {
+//        isLogin = false;
+//        alert("請先登入");
+//        $("#loginDiv").show();        
+//        $("#headerDiv").hide(); 
+//        return 1;
+//      }
+      
+      if (!confirm('確定要下載訂單修改歷程? \n\r請用 Excel 或 Google 試算表 "匯入" 訂單修改歷程.txt，並只使用逗號作為分隔字元')) return 0;
+      
+      $.loading.start("下載資料中...");
+      
+      var 總資料;
+      firebase.database().ref('Curves/訂單修改歷程').once('value').then(function(snapshot) {
+        console.log("讀取訂單修改歷程完成");
+        總資料 = snapshot.val();
+        var cvsString="修改日期時間, 修改訂單號碼, 修改者, 修改項目1, 修改項目2, \r\n";
+        var modifyDates = Object.keys(總資料);       
+        modifyDates.forEach(function(date, index, array){
+          cvsString+= String(new Date(date)) + ",";
+          
+          
+          modifyOrders=Object.keys(總資料[date]);
+          //console.log(modifyOrders);
+          modifyOrders.forEach(function(order, index1, array1){
+            cvsString += order +",";         
+            cvsString += 總資料[date][order]["訂單修改者"] + ",";
+            changesStr = 總資料[date][order]["訂單修改差異"];
+            cvsString += changesStr.substr(1, changesStr.length-2) +","; 
+
+          });   
+          cvsString+= "\r\n";
+        });
+
+        var blob = new Blob([cvsString], { type: 'text/plain' });
+        var anchor = document.createElement('a');
+
+        anchor.download = "訂單修改歷程.txt";
+        anchor.href = (window.webkitURL || window.URL).createObjectURL(blob);
+        anchor.dataset.downloadurl = ['text/plain', anchor.download, anchor.href].join(':');
+        anchor.click(); 
+        
+        $.loading.end();
+      });  
+    }    
   </script>
-
-
 
 </body>
 

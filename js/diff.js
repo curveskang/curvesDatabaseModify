@@ -115,8 +115,16 @@ var diff = function (obj1, obj2) {
     // Loop through the second object and find missing items
     for (key in obj2) {
         if (obj2.hasOwnProperty(key)) {
-            if (!obj1[key] && obj1[key] !== obj2[key] ) {
-                diffs[key] = obj2[key];
+            if (!obj1.hasOwnProperty(key)){
+              obj1[key]="無此欄位";
+//            } else if (obj1[key]==null) {
+//              obj1[key]="null";
+//            } else if (obj1[key]=="") {
+//              obj1[key]="空白";
+            }
+          
+            if (obj1[key] !== obj2[key] ) {
+                diffs[key] = obj1[key]+" -> "+obj2[key];
             }
         }
     }
