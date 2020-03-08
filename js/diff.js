@@ -124,6 +124,7 @@ var diff = function (obj1, obj2) {
             }
           
             if (obj1[key] !== obj2[key] ) {
+                //console.log("diff: ",obj1[key]," -> ",obj2[key])
                 diffs[key] = obj1[key]+" -> "+obj2[key];
             }
         }

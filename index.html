@@ -22,11 +22,17 @@
   <script src="js/diff.js"></script>  
   <script src="HC_Order_Main_Model.js"></script>  
   <script>
-      logoutByReload=true; // set to true for security
+      logoutByReload    =false; // set to true for security
+      usingLocalAPI     =false;  // set to true for using loaclhost:5000 for API tests
+      usingTestDatabase =true;  // set to true for using Test database
   </script>  
 </head>
 
 <body>
+  <div id="banner" style="background:darkgreen;">
+  <h1 id="bannerMessage" style="color: white; font-weight: normal">使用測試資料庫</h1>
+  </div>
+  
   <div id="loginDiv">
     <h1>管理員登入</h1>
     <div id="login" style="border-width:1px;border-style:solid;border-color:gray;padding-top: 30px; width: 680px;height: 180px; margin: 0 auto; margin-top: 30px">
@@ -112,6 +118,13 @@
         isLogin = true;
         
         //console.log("Login-in");
+        if (authUser.email=="admin@curves.com") {
+          usingTestDatabase = false;
+          $("#banner").css("background-color", "red");
+        } else {
+          usingTestDatabase = true;
+          $("#banner").css("background-color", "darkgreen");         
+        }
         $.loading.end();
         $("#loginDiv").hide();
         $("#headerDiv").show();
@@ -174,9 +187,13 @@
       var request = new XMLHttpRequest();
       
       var orderNO = $("#order_No").val();
-      var paramToSend = 'https://curves-database-api.herokuapp.com/?API=01&Order_NO='+orderNO+"&Access="+authUser.uid;
-      //var paramToSend = 'http://localhost:5000/?API=01&Order_NO='+orderNO+"&Access="+authUser.uid;
-      //console.log(paramToSend);
+    
+      var urlHeroku = 'https://curves-database-api.herokuapp.com/?API=01&Order_NO=';
+      var urlLocal  = 'http://localhost:5000/?API=01&Order_NO=';
+      var urlToSend = (usingLocalAPI)? urlLocal:urlHeroku;
+      var paramToSend = urlToSend+orderNO+"&UID="+authUser.uid;
+      
+      console.log(paramToSend);
       
       $.loading.start("讀取訂單");      
       request.open('GET', paramToSend, true);
@@ -285,10 +302,9 @@
       if (jQuery.isEmptyObject(orderDiff)) {
         alert("訂單沒有修改，不上傳");
       } else {
-        // TODO: 上傳 modifiedOrder 到 Curves database by API
-        
-        // 上傳 修改歷程 到 Firebase
-        upload修改歷程(modifiedOrder.order_No, orderDiff);        
+        // 上傳 modifiedOrder 到 Curves database by API
+        $.loading.start("上傳更新訂單");
+        uploadOrder();            
       }
     }
     
@@ -311,7 +327,9 @@
           case 'string':  項目資料 = 項目資料isNull?null:$(項目編號).val(); break;  
           case 'dateTime':項目資料 = 項目資料isNull?null:$(項目編號).val(); break;  
           case 'byte[]':  項目資料 = orgOrder[englishKeys[i]]; break;
-          case 'array':   項目資料 = orgOrder[englishKeys[i]]; break;            
+          case 'array':   項目資料 = orgOrder[englishKeys[i]]; break; 
+          //case 'byte[]':  項目資料 = ""; break;
+          //case 'array':   項目資料 = ""; break; 
           default: console.log("error type", typeMappingTable[englishKeys[i]]);
         }
         
@@ -320,45 +338,51 @@
           if (項目資料==MKKK) 項目資料=UNKKK;         
         }
         
+        
+//        if ((englishKeys[i]=="credit_Card_Sign") || (englishKeys[i]=="order_Sign")) {
+//          console.log("Not to add", englishKeys[i]);
+//        } else {
+//          orderModified[englishKeys[i]]=項目資料;
+//        }
+        
         orderModified[englishKeys[i]]=項目資料;
       };
       
       return orderModified;           
     }
     
-    function upload修改歷程(order_No, orderDiff){
-      console.log("upload修改歷程");
-      //console.log(order_No, orderDiff);
-
-      // use dateTime as the tag
-      var nowTime = new Date();
-      var dateISOString = nowTime.toISOString();
-      dateISOString = dateISOString.substr(0,19)+"Z";
-      
-      database.ref('Curves/訂單修改歷程/'+dateISOString+"/"+order_No).set({
-        修改前訂單: JSON.stringify(orgOrder),
-        訂單修改差異: JSON.stringify(orderDiff),
-        訂單修改者: authUser.email,        
-      }, function(error){
-        if (error) {
-          console.log(error);
-          return 0;
-        }
-        alert("修改訂單上傳完成")  
-        console.log('Write to database successful');
-      });       
-    }
+//    function upload修改歷程(order_No, orderDiff){
+//      console.log("upload修改歷程");
+//      //console.log(order_No, orderDiff);
+//
+//      // use dateTime as the tag
+//      var nowTime = new Date();
+//      var dateISOString = nowTime.toISOString();
+//      dateISOString = dateISOString.substr(0,19)+"Z";
+//      
+//      database.ref('Curves/訂單修改歷程/'+dateISOString+"/"+order_No).set({
+//        修改前訂單: JSON.stringify(orgOrder),
+//        訂單修改差異: JSON.stringify(orderDiff),
+//        訂單修改者: authUser.email,        
+//      }, function(error){
+//        if (error) {
+//          console.log(error);
+//          return 0;
+//        } 
+//        console.log('Write to database successful');
+//      });       
+//    }
     
     function 下載訂單修改歷程() {
       
       // check firebase auth
-//      if (authUser == null) {
-//        isLogin = false;
-//        alert("請先登入");
-//        $("#loginDiv").show();        
-//        $("#headerDiv").hide(); 
-//        return 1;
-//      }
+      if (authUser == null) {
+        isLogin = false;
+        alert("請先登入");
+        $("#loginDiv").show();        
+        $("#headerDiv").hide(); 
+        return 1;
+      }
       
       if (!confirm('確定要下載訂單修改歷程? \n\r請用 Excel 或 Google 試算表 "匯入" 訂單修改歷程.txt，並只使用逗號作為分隔字元')) return 0;
       
@@ -397,6 +421,86 @@
         $.loading.end();
       });  
     }    
+
+    function uploadOrder() {
+      if (authUser == null) {
+        isLogin = false;
+        alert("請先登入");
+        $("#loginDiv").show();        
+        $("#headerDiv").hide(); 
+        return 1;
+      }
+      
+      console.log("uploadOrder");
+      var request = new XMLHttpRequest();
+      
+      var orderNO = $("#order_No").val();
+      var modifiedOrder = combineOrderDetail();
+      
+      var orderStr  = JSON.stringify(modifiedOrder);
+      var urlHeroku = 'https://curves-database-api.herokuapp.com/?API=10';      
+      var urlLocal  = 'http://localhost:5000/?API=10';
+      var urlToSend = (usingLocalAPI)? urlLocal:urlHeroku;
+      var paramToSend = urlToSend+"&UID="+authUser.uid+"&Update_Order="+orderStr;
+      
+      console.log(paramToSend.length);
+      console.log(paramToSend);
+      
+
+      request.open('GET', paramToSend, true);
+      request.send();
+      
+      request.onload = function(e) {
+        //console.log(request.responseText, (request.responseText!="Error: No access"));         
+        if (request.status == 200) {
+          console.log("上傳更新訂單完成");
+
+          var resultStr = request.responseText;
+          var objStr = resultStr.substr(20, resultStr.length);
+          console.log(objStr);
+          var resultObj = JSON.parse(objStr);
+          console.log(resultObj.errPairs[0].errCode, ":", resultObj.errPairs[0].errMsg );
+          //$.loading.end();
+          
+          if (resultObj.errPairs[0].errCode!=0) {
+            alert("上傳更新訂單失敗");
+            return;
+          } else {
+            alert("上傳更新訂單完成");
+          }
+          
+          console.log("upload修改歷程");        
+          var orderDiff = diff(orgOrder, modifiedOrder);  
+          var orderNO = $("#order_No").val();
+
+          // use dateTime as the tag
+          var nowTime = new Date();
+          var dateISOString = nowTime.toISOString();
+          dateISOString = dateISOString.substr(0,19)+"Z";
+
+          database.ref('Curves/訂單修改歷程/'+dateISOString+'/'+orderNO).set({
+            修改前訂單: JSON.stringify(orgOrder),
+            訂單修改差異: JSON.stringify(orderDiff),
+            訂單修改者: authUser.email,        
+          }, function(error){
+            if (error) {
+              console.log(error);
+              alert("上傳修改歷程失敗");
+              $.loading.end();              
+            } 
+            console.log('Write to database successful');
+            $.loading.end();
+            //alert("上傳修改歷成功");            
+          });          
+
+        } else {
+          $.loading.end();
+
+          alert("上傳更新訂單失敗");
+        }    
+      }   
+    }
+      
   </script>
 
 </body>
