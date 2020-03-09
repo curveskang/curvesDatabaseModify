@@ -287,8 +287,15 @@
           $("#orderDetail").append(elementStr2); 
 
           i++;
-        }
+        }     
       };
+      
+//      $("#credit_Card_Sign").val("不可修改");
+//      $("#order_Sign").val("不可修改");      
+//      $("#approved_Date").val("不可修改");
+//      $("#出貨時間歷史記錄").val("不可修改");        
+//      $("#import_Time").val("不可修改");       
+//      $("#import_Ship_History").val("不可修改");  
       
       $("#orderDetail").append('<hr><button class="btn-blue" onclick="downloadOrder()" style="float:none;margin-left:380px"><i class="fa fa-download"></i>&nbsp 下載資料</button><button class="btn-red" onclick="uploadModifiedOrder()" style="float:none"><i class="fa fa-upload"></i>&nbsp 上傳修改訂單</button><button class="btn-red" onclick="下載訂單修改歷程()" style="float:none;background-color: teal"><i class="fa fa-history"></i>&nbsp 下載修改歷程</button><button class="btn-red" onclick="signout()" style="float:none;background-color: darkslategray"><i class="fa fa-sign-out"></i>&nbsp 登出</button>');
     }
@@ -312,7 +319,8 @@
       var orderModified={};
       
       orderModified["id"]=orgOrder["id"];
-      orderModified["tableType"]=orgOrder["tableType"];      
+      orderModified["tableType"]=orgOrder["tableType"];     
+      var ppp=0;
       for (var i=0; i< chineseKeys.length; i++) {
         var 項目編號 = '#'+englishKeys[i];
         var 項目資料;
@@ -328,8 +336,8 @@
           case 'dateTime':項目資料 = 項目資料isNull?null:$(項目編號).val(); break;  
           case 'byte[]':  項目資料 = orgOrder[englishKeys[i]]; break;
           case 'array':   項目資料 = orgOrder[englishKeys[i]]; break; 
-          //case 'byte[]':  項目資料 = ""; break;
-          //case 'array':   項目資料 = ""; break; 
+//          case 'byte[]':  項目資料 = " "; break;
+//          case 'array':   項目資料 = " "; break; 
           default: console.log("error type", typeMappingTable[englishKeys[i]]);
         }
         
@@ -339,13 +347,24 @@
         }
         
         
-//        if ((englishKeys[i]=="credit_Card_Sign") || (englishKeys[i]=="order_Sign")) {
+        if ((englishKeys[i]=="credit_Card_Sign") 
+          ||(englishKeys[i]=="order_Sign")      
+          ||(englishKeys[i]=="出貨時間歷史紀錄")             
+//          ||(englishKeys[i]=="approved_Date")      
+//          ||(englishKeys[i]=="import_Time")             
+          ||(englishKeys[i]=="import_ship_History")             
+           ) {
 //          console.log("Not to add", englishKeys[i]);
-//        } else {
-//          orderModified[englishKeys[i]]=項目資料;
-//        }
-        
-        orderModified[englishKeys[i]]=項目資料;
+//          if (項目資料 != null) {
+//            ppp+=項目資料.length;
+//            console.log(englishKeys[i], 項目資料.length );          
+//          }
+
+          orderModified[englishKeys[i]]=" ";    
+          
+        } else {
+          orderModified[englishKeys[i]]=項目資料;
+        }
       };
       
       return orderModified;           
@@ -441,12 +460,14 @@
       var urlHeroku = 'https://curves-database-api.herokuapp.com/?API=10';      
       var urlLocal  = 'http://localhost:5000/?API=10';
       var urlToSend = (usingLocalAPI)? urlLocal:urlHeroku;
-      var paramToSend = urlToSend+"&UID="+authUser.uid+"&Update_Order="+orderStr;
+      var paramToSend0 = urlToSend+"&UID="+authUser.uid+"&Update_Order="+orderStr;
       
-      console.log(paramToSend.length);
-      console.log(paramToSend);
+//      console.log(paramToSend0.length);
+//      var paramToSend = encodeURI(paramToSend0);
+//      console.log(paramToSend0.length, paramToSend.length);      
+      var paramToSend = paramToSend0.replace(/\+/g,"_XXX_");
+      console.log("URL Length:", paramToSend.length);
       
-
       request.open('GET', paramToSend, true);
       request.send();
       
