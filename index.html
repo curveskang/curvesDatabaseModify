@@ -22,8 +22,8 @@
   <script src="js/diff.js"></script>  
   <script src="HC_Order_Main_Model.js"></script>  
   <script>
-      logoutByReload    =false; // set to true for security
-      usingLocalAPI     =true;  // set to true for using loaclhost:5000 for API tests
+      logoutByReload    =true; // set to true for security
+      usingLocalAPI     =false;  // set to true for using loaclhost:5000 for API tests
       usingTestDatabase =true;  // set to true for using Test database
   </script>  
 </head>
@@ -290,12 +290,12 @@
         }     
       };
       
-//      $("#credit_Card_Sign").val("不可修改");
-//      $("#order_Sign").val("不可修改");      
-//      $("#approved_Date").val("不可修改");
-//      $("#出貨時間歷史記錄").val("不可修改");        
-//      $("#import_Time").val("不可修改");       
-//      $("#import_Ship_History").val("不可修改");  
+      $("#credit_Card_Sign").val("不可修改");
+      $("#order_Sign").val("不可修改");      
+      $("#approved_Date").css("display", "none");      
+      $("#import_Time").css("display", "none");   
+      $("#出貨時間歷史記錄").val("不可修改");        
+      $("#import_Ship_History").val("不可修改");  
       
       $("#orderDetail").append('<hr><button class="btn-blue" onclick="downloadOrder()" style="float:none;margin-left:380px"><i class="fa fa-download"></i>&nbsp 下載資料</button><button class="btn-red" onclick="uploadModifiedOrder()" style="float:none"><i class="fa fa-upload"></i>&nbsp 上傳修改訂單</button><button class="btn-red" onclick="下載訂單修改歷程()" style="float:none;background-color: teal"><i class="fa fa-history"></i>&nbsp 下載修改歷程</button><button class="btn-red" onclick="signout()" style="float:none;background-color: darkslategray"><i class="fa fa-sign-out"></i>&nbsp 登出</button>');
     }
