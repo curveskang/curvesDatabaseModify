@@ -121,9 +121,11 @@
         if (authUser.email=="admin@curves.com") {
           usingTestDatabase = false;
           $("#banner").css("background-color", "red");
+          $("#bannerMessage").text("*** 操作正式資料庫 - 請小心 ***");          
         } else {
           usingTestDatabase = true;
-          $("#banner").css("background-color", "darkgreen");         
+          $("#banner").css("background-color", "darkgreen"); 
+          $("#bannerMessage").text("使用測試資料庫");           
         }
         $.loading.end();
         $("#loginDiv").hide();
